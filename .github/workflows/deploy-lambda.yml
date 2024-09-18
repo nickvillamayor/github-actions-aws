@@ -1,4 +1,4 @@
-name: Deploy Lambda Function
+name: Deploy Lambda Function with CloudFormation
 
 on:
   push:
@@ -20,24 +20,32 @@ jobs:
 
     - name: Install Dependencies
       run: npm install
-      working-directory: lambda-function
+      working-directory: sample-lambda
 
-    - name: Deploy Lambda to AWS
+    - name: Get working directory name
+      id: get-directory-name
+      run: echo "LAMBDA_DIR=$(basename sample-lambda)" >> $GITHUB_ENV
+
+    - name: Zip Lambda Function
+      run: zip -r $LAMBDA_DIR.zip .
+      working-directory: sample-lambda
+
+    - name: Upload Lambda Zip to S3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
       run: |
-        zip -r function.zip .
-        aws lambda create-function \
-          --function-name my-lambda-function \
-          --runtime nodejs14.x \
-          --role arn:aws:iam::YOUR_ACCOUNT_ID:role/LambdaExecutionRole \
-          --handler index.handler \
-          --zip-file fileb://function.zip \
-          --region $AWS_REGION \
-          || aws lambda update-function-code \
-          --function-name my-lambda-function \
-          --zip-file fileb://function.zip \
-          --region $AWS_REGION
-      working-directory: lambda-function
+        aws s3 cp lambda-function/$LAMBDA_DIR.zip s3://YOUR_S3_BUCKET_NAME/$LAMBDA_DIR.zip
+
+    - name: Deploy CloudFormation Stack
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        aws cloudformation deploy \
+          --template-file cloudformation/lambda-template.yml \
+          --stack-name my-lambda-stack \
+          --parameter-overrides S3BucketName=YOUR_S3_BUCKET_NAME S3Key=$LAMBDA_DIR.zip \
+          --capabilities CAPABILITY_NAMED_IAM
