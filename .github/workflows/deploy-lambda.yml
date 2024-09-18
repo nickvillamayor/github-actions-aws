@@ -36,7 +36,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
       run: |
-        aws s3 cp lambda-function/$LAMBDA_DIR.zip s3://YOUR_S3_BUCKET_NAME/$LAMBDA_DIR.zip
+        aws s3 cp $LAMBDA_DIR.zip s3://YOUR_S3_BUCKET_NAME/$LAMBDA_DIR.zip
 
     - name: Deploy CloudFormation Stack
       env:
