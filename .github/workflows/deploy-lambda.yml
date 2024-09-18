@@ -35,17 +35,19 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}  # Use the bucket name from GitHub Secrets
       run: |
-        aws s3 cp $LAMBDA_DIR.zip s3://YOUR_S3_BUCKET_NAME/$LAMBDA_DIR.zip
+        aws s3 cp $LAMBDA_DIR.zip s3://$S3_BUCKET_NAME/$LAMBDA_DIR.zip
 
     - name: Deploy CloudFormation Stack
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}  # Use the bucket name from GitHub Secrets
       run: |
         aws cloudformation deploy \
           --template-file cloudformation/lambda-template.yml \
           --stack-name my-lambda-stack \
-          --parameter-overrides S3BucketName=YOUR_S3_BUCKET_NAME S3Key=$LAMBDA_DIR.zip \
+          --parameter-overrides S3BucketName=$S3_BUCKET_NAME S3Key=$LAMBDA_DIR.zip \
           --capabilities CAPABILITY_NAMED_IAM
