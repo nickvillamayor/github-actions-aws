@@ -50,4 +50,6 @@ jobs:
       run: |
         aws cloudformation deploy \
           --template-file cloudformation/lambda-template.yml \
-          --stack
+          --stack-name my-lambda-stack \
+          --parameter-overrides S3BucketName=$S3_BUCKET_NAME S3Key=$LAMBDA_DIR.zip \
+          --capabilities CAPABILITY_NAMED_IAM
