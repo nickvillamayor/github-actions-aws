@@ -3,7 +3,9 @@ name: Deploy Lambda Function with CloudFormation
 on:
   push:
     branches:
-      - main  # Run this workflow on every push to the main branch
+      - main  # Run this workflow automatically on every push to the main branch
+
+  workflow_dispatch:  # Allows the workflow to be manually triggered on demand
 
 jobs:
   deploy:
@@ -16,7 +18,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '18'
 
     - name: Install Dependencies
       run: npm install
@@ -48,6 +50,4 @@ jobs:
       run: |
         aws cloudformation deploy \
           --template-file cloudformation/lambda-template.yml \
-          --stack-name my-lambda-stack \
-          --parameter-overrides S3BucketName=$S3_BUCKET_NAME S3Key=$LAMBDA_DIR.zip \
-          --capabilities CAPABILITY_NAMED_IAM
+          --stack
