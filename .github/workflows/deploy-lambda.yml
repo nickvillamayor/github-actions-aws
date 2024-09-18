@@ -27,7 +27,7 @@ jobs:
       run: echo "LAMBDA_DIR=$(basename sample-lambda)" >> $GITHUB_ENV
 
     - name: Zip Lambda Function
-      run: zip -r $LAMBDA_DIR.zip .
+      run: zip -r ../$LAMBDA_DIR.zip .
       working-directory: sample-lambda
 
     - name: Upload Lambda Zip to S3
