@@ -1,6 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Lambda function deployment using CloudFormation
 
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket containing the Lambda code
+  S3Key:
+    Type: String
+    Description: The key (file path) of the Lambda zip file in the S3 bucket
+
 Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
